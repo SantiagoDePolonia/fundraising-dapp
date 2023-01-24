@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
- * FundrisingToken contract is dedicated for people who want to collect exact amount of coins (ETH at ethereum chain).
+ * FundraisingToken contract is dedicated for people who want to collect exact amount of coins (ETH at ethereum chain).
  * During construction you need to set your target.
  * There is no time limit for how long the monay are collected at this implementation.
  * The funder can withdrow money in two cases:
@@ -20,17 +20,20 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
  * - if the owner would die or
  * - if the owner would transfer ownership to the wrong address
  *     the funds would be safe and withrawal would be possible again after a year.
+ *
+ * The (d)app can listen to (ERC20)Transfer events for following the collection progress.
  */
-contract FundrisingToken is ERC20, Ownable, ReentrancyGuard {
-    uint private _fundrisingGoal;
+contract FundraisingToken is ERC20, Ownable, ReentrancyGuard {
+    uint private _fundraisingGoal;
 
     // This is used for security purpose.
     // If the contract creater wouldn't spend the many within a year.
     // the people who funded the contract might withdrow it.
-    uint private _fundrisingGoalAchivedDate = 0;
+    uint private _fundraisingGoalAchivedDate = 0;
 
+    // uint32 max = 4294967295 seconds ~ 136.1 years
     // 60 sec * 60 * 24 * 365 = 31536000 ~ one year
-    uint constant WITHDRAW_NOT_SPENT_TIMEOUT = 31536000;
+    uint32 constant WITHDRAW_NOT_SPENT_TIMEOUT = 31536000;
 
     bool private fundsWithdrawedByOwner = false;
 
@@ -42,25 +45,28 @@ contract FundrisingToken is ERC20, Ownable, ReentrancyGuard {
     /**
      * @dev Emitted once when a fundrise goal is achieved.
      */
-    event CollectedFundsWithdrawedByOwner();
+    event CollectedFundsWithdrawnByOwner();
 
-    constructor(uint fundrisingGoal_) ERC20("Foundraised Token", "FRT") {
-        _fundrisingGoal = fundrisingGoal_;
+    constructor(uint fundraisingGoal_) ERC20("Fundraised Token", "FRT") {
+        require(0 != fundraisingGoal_);
+        _fundraisingGoal = fundraisingGoal_;
     }
 
-    function fundrisingGoal() external view returns (uint) {
-        return _fundrisingGoal;
+    function fundraisingGoal() external view returns (uint) {
+        return _fundraisingGoal;
     }
 
     function mint() external payable nonReentrant {
         require(msg.value != 0, "Transaction without value.");
 
-        // If the goal is achieved you cannot mint more tokens
-        require(_fundrisingGoalAchivedDate == 0);
+        require(
+            _fundraisingGoalAchivedDate == 0,
+            "Fundraising goal achieved. You cannot mint more!"
+        );
 
-        // Collect only as mach as _fundrisingGoal.
-        if (totalSupply() + msg.value >= _fundrisingGoal) {
-            uint amountLeftToFund = _fundrisingGoal - totalSupply();
+        // Collect only as mach as _fundraisingGoal.
+        if (totalSupply() + msg.value >= _fundraisingGoal) {
+            uint amountLeftToFund = _fundraisingGoal - totalSupply();
 
             if (amountLeftToFund != msg.value) {
                 (bool sent, ) = msg.sender.call{
@@ -70,19 +76,31 @@ contract FundrisingToken is ERC20, Ownable, ReentrancyGuard {
             }
 
             _mint(msg.sender, amountLeftToFund);
-            _fundrisingGoalAchivedDate = block.timestamp;
+            _fundraisingGoalAchivedDate = block.timestamp;
             emit GoalAchieved();
         } else {
             _mint(msg.sender, msg.value);
         }
     }
 
+    // When the fundrise goal has been achieved
+    // the Owner can withdraw everything
+    // even those funds transfered by mistake to contract address
     function withdrawFunds() external onlyOwner {
-        require(!fundsWithdrawedByOwner);
-        require(totalSupply() != 0);
-        (bool sent, ) = msg.sender.call{value: totalSupply()}("");
+        require(
+            0 != _fundraisingGoalAchivedDate,
+            "Fundraising goal is not achieved!"
+        );
+        require(
+            0 != address(this).balance,
+            "The contract balance equals zero!"
+        );
+
+        (bool sent, ) = msg.sender.call{value: address(this).balance}("");
         require(sent, "Failed to send Ether");
-        emit CollectedFundsWithdrawedByOwner();
+
+        fundsWithdrawedByOwner = true;
+        emit CollectedFundsWithdrawnByOwner();
     }
 
     function withdrawMyFunds() external nonReentrant {
@@ -90,9 +108,9 @@ contract FundrisingToken is ERC20, Ownable, ReentrancyGuard {
         // 1. the goal wasn't achieved yet.
         // 2. the goal has been achieved more than year ago AND the owner didn't withdraw the funds
         require(
-            _fundrisingGoalAchivedDate == 0 ||
+            _fundraisingGoalAchivedDate == 0 ||
                 (!fundsWithdrawedByOwner &&
-                    (_fundrisingGoalAchivedDate + WITHDRAW_NOT_SPENT_TIMEOUT >
+                    (_fundraisingGoalAchivedDate + WITHDRAW_NOT_SPENT_TIMEOUT >
                         block.timestamp))
         );
 
