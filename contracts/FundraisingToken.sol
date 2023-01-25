@@ -21,7 +21,12 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
  * - if the owner would transfer ownership to the wrong address
  *     the funds would be safe and withrawal would be possible again after a year.
  *
- * The (d)app can listen to (ERC20)Transfer events for following the collection progress.
+ * The contract emit:
+ * - GoalAchieved event when the goal is achieved.
+ * - CollectedFundsWithdrawnByOwner event when the owner withdrawn the coins
+ * - other inherited from ERC20 contract events
+ * The (d)app can listen to (ERC20)Transfer events for following the collection progress
+ *   by comparing it against fundraisingGoal.
  */
 contract FundraisingToken is ERC20, Ownable, ReentrancyGuard {
     uint private _fundraisingGoal;
@@ -38,12 +43,12 @@ contract FundraisingToken is ERC20, Ownable, ReentrancyGuard {
     bool private fundsWithdrawedByOwner = false;
 
     /**
-     * @dev Emitted once when a fundrise goal is achieved.
+     * @dev Emitted once when a fundraise goal is achieved.
      */
     event GoalAchieved();
 
     /**
-     * @dev Emitted once when a fundrise goal is achieved.
+     * @dev Emitted once when a fundraise goal is achieved.
      */
     event CollectedFundsWithdrawnByOwner();
 
