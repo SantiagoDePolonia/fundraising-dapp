@@ -110,8 +110,9 @@ contract FundraisingToken is ERC20, Ownable, ReentrancyGuard {
         require(
             _fundraisingGoalAchivedDate == 0 ||
                 (!fundsWithdrawedByOwner &&
-                    (_fundraisingGoalAchivedDate + WITHDRAW_NOT_SPENT_TIMEOUT >
-                        block.timestamp))
+                    (_fundraisingGoalAchivedDate + WITHDRAW_NOT_SPENT_TIMEOUT <=
+                        block.timestamp)),
+            "Withdrawal impossible!"
         );
 
         uint balanceOfSender = balanceOf(msg.sender);

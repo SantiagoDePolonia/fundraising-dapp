@@ -183,16 +183,70 @@ describe("contract FundraisingToken ", async function () {
       expect(
         String(await ethers.provider.getBalance(owner.address)).slice(0, 2)
       ).to.be.equal("14");
-
-      await addr1.sendTransaction({
-        to: hardhatToken.address,
-        value: ONE_ETH, // Sends exactly 1.0 ether
-      });
     });
   });
-  // TODO:
-  // withdrawMyFunds()
 
-  // - can withdraw when the goal is not achieved
-  // - can withdraw when the goal is achieved and one year passed and the contract owner hadn't withdrawn
+  describe(`FundraisingToken.withdrawMyFunds()`, async () => {
+    // - can withdraw when the goal is not achieved
+    it("the fundraiser can withdraw funds when the goal is not achieved", async () => {
+      const { hardhatToken, addr1 } = await loadFixture(deployTokenFixture);
+      await network.provider.send("hardhat_setBalance", [
+        addr1.address,
+        "0x6F05B59D3B20000", // 0.5 ETH - for gas
+      ]);
+
+      await hardhatToken
+        .connect(addr1)
+        .mint({ value: ethers.utils.parseEther("0.4") });
+
+      await hardhatToken.connect(addr1).withdrawMyFunds();
+
+      await expect(
+        await ethers.provider.getBalance(hardhatToken.address)
+      ).to.be.equal("0");
+
+      await expect(await hardhatToken.balanceOf(addr1.address)).to.be.equal(
+        "0"
+      );
+
+      await expect(
+        String(await ethers.provider.getBalance(addr1.address)).slice(0, 3)
+      ).to.be.equal("499");
+    });
+
+    it("the fundraiser can not withdraw when the goal is achieved", async () => {
+      const { hardhatToken, addr1 } = await loadFixture(deployTokenFixture);
+      await network.provider.send("hardhat_setBalance", [
+        addr1.address,
+        "0x56BC75E2D63100000", // 100 ETH
+      ]);
+
+      await hardhatToken
+        .connect(addr1)
+        .mint({ value: ethers.utils.parseEther("1") });
+
+      await expect(hardhatToken.connect(addr1).withdrawMyFunds()).rejectedWith(
+        "Withdrawal impossible!"
+      );
+    });
+
+    it("the fundraiser can not withdraw when the goal is achieved", async () => {
+      const { hardhatToken, addr1 } = await loadFixture(deployTokenFixture);
+      await network.provider.send("hardhat_setBalance", [
+        addr1.address,
+        "0x56BC75E2D63100000", // 100 ETH
+      ]);
+
+      await hardhatToken
+        .connect(addr1)
+        .mint({ value: ethers.utils.parseEther("1") });
+
+      await network.provider.send("evm_increaseTime", [31536001]);
+
+      await hardhatToken.connect(addr1).withdrawMyFunds();
+      await expect(await hardhatToken.balanceOf(addr1.address)).to.be.equal(
+        "0"
+      );
+    });
+  });
 });
