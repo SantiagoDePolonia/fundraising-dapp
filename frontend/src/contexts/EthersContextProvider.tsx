@@ -8,10 +8,21 @@ import {
 
 import { configureChains, createClient } from "wagmi";
 
-import { arbitrum, mainnet, polygon } from "wagmi/chains";
+import { arbitrum, hardhat, mainnet, polygon } from "wagmi/chains";
 import { WEB3_MODAL_PROJECT_ID } from "../constants";
+import { getNetwork, JsonRpcProvider } from "@ethersproject/providers";
 
-const chains = [arbitrum, mainnet, polygon];
+const CHAIN_ID=31337;
+const RPC_URL="http://127.0.0.1:8545/";
+
+const chains = [/*arbitrum, mainnet, polygon,*/ hardhat];
+const hardhatEthProvider = new JsonRpcProvider(RPC_URL, getNetwork(CHAIN_ID));
+
+// const client = createClient({
+//     autoConnect: true,
+//     provider: hardhatEthProvider,
+//     connectors: [connector],
+// });
 
 // Wagmi client
 const { provider } = configureChains(chains, [
@@ -21,7 +32,8 @@ const { provider } = configureChains(chains, [
 const wagmiClient = createClient({
   autoConnect: true,
   connectors: modalConnectors({ appName: "web3Modal", chains }),
-  provider,
+  provider: hardhatEthProvider
+  //  provider,
 });
 
 // Web3Modal Ethereum Client

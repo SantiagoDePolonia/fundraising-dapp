@@ -3,12 +3,12 @@ import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { ContractTransaction } from "ethers";
 
-const FUNDRAISING_GOAL = "1000000000000000000"; // 1 ETH
+const FUNDRAISING_GOAL = ethers.utils.parseEther("1");
 
 // TODO: you might replace it with ethers.utils.parseEther
-const HALF_ETC = "500000000000000000"; // 0.5 ETH
-const ONE_ETH = "1000000000000000000"; // 1 ETH
-const TWO_ETH = "2000000000000000000"; // 2 ETH
+const HALF_ETC = ethers.utils.parseEther("0.5");
+const ONE_ETH = ethers.utils.parseEther("1");
+const TWO_ETH = ethers.utils.parseEther("2");
 
 describe("contract FundraisingToken ", async function () {
   async function deployTokenFixture() {

@@ -1,6 +1,5 @@
 
 import React, { useContext } from 'react';
-import { Web3Button } from "@web3modal/react";
 import { Web3Modal } from '@web3modal/react';
 import { WagmiConfig } from 'wagmi';
 import { WEB3_MODAL_PROJECT_ID } from '../constants';
