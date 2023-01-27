@@ -1,15 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
+import EthersContextProvider from './contexts/EthersContextProvider';
+import Web3ModalWrapper from './components/Web3ModalWrapper';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
-    <App />
+    <EthersContextProvider>
+      <Web3ModalWrapper />
+    </EthersContextProvider>
   </React.StrictMode>
 );
 
