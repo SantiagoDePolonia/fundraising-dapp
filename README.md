@@ -11,9 +11,8 @@ The smart contract has 100% unit test coverage.
 Run the following commands:
 
 ```bash
-$ npx hardhat compile FundraisingToken # compile smart contract
+$ npx hardhat compile # compile smart contract
 $ npx hardhat node # start a node
-$ npx hardhat run --network localhost scripts/deploy.ts # in the second terminal
 ```
 
 At the second terminal:
