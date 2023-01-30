@@ -4,6 +4,8 @@ It's beautiful Fundraising decentralized app with Solidity smart contract. It's 
 
 The smart contract has 100% unit test coverage.
 
+![Screenshot](./docs/screen.png "Screenshot")
+
 ### How to run the project?
 
 ```bash
