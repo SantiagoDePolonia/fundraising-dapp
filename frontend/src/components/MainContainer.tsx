@@ -9,6 +9,7 @@ function MainContainer() {
   const { address, isConnecting, isDisconnected } = useAccount()
  
   return (
+    <>
     <div className="container">
       <header className="header">
         <div className="logo">
@@ -27,6 +28,10 @@ function MainContainer() {
         {address && <UserPage />}
       </main>
     </div>
+    <div className='parrot animated-animal'></div>
+    <div className='camel animated-animal'></div>
+    <div className='eagle animated-animal'></div>
+    </>
   );
 }
 
