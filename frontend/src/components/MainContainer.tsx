@@ -12,7 +12,8 @@ function MainContainer() {
     <div className="container">
       <header className="header">
         <div className="logo">
-          <h1>Fundraising dApp</h1>
+          <h1>Holiday fundraiser</h1>
+          <h2>You have incredible opportunity to support my entertainment!</h2>
         </div>
         <Web3Button />
       </header>
@@ -20,7 +21,6 @@ function MainContainer() {
         <div className='status'>
           {isConnecting && <div>Connecting…</div>}
           {isDisconnected && <div>
-            <p>Connect your wallet:</p>
             <Web3Button />
           </div>}
         </div>
