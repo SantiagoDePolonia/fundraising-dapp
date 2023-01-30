@@ -8,15 +8,28 @@ The smart contract has 100% unit test coverage.
 
 ### How to run the project?
 
+Run the following commands:
+
 ```bash
 $ npx hardhat compile FundraisingToken # compile smart contract
 $ npx hardhat node # start a node
 $ npx hardhat run --network localhost scripts/deploy.ts # in the second terminal
+```
+
+At the second terminal:
+
+```bash
+$ npx hardhat run --network localhost scripts/deploy.ts # in the second terminal
+```
+
+Copy the contract address and past it into the `./frontend/src/constants/index.ts` file.
+
+Next, start the frontend server in the terminal:
+
+```bash
 $ cd frontend
 $ yarn start
 ```
-
-Copy the contract ID and replace it inside of `./frontend/src/constants/index.ts`
 
 ### Dependencies
 
